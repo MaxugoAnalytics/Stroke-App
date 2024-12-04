@@ -1,18 +1,29 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import gdown
 from sklearn.preprocessing import StandardScaler
-# Load the trained decision tree model and scaler
-model_path = r"C:\Users\USER\Desktop\nalytic1\MYW\models\lr.save"
-scaler_path = r"C:\Users\USER\Desktop\nalytic1\MYW\models\scaler.pkl"
 
-# Load the saved model and scaler
-model = joblib.load(model_path)
+# URLs for the scaler and the logistic regression model
+scaler_url = "https://drive.google.com/uc?id=1KIj_PCCiAmOMDi6nZj-XqpFzAAsC_a5H"
+model_url = "https://drive.google.com/uc?id=1n-oQezif9IMaTpdmw5cPas1aFOWOlygy"
+
+# Local file paths
+scaler_path = "scaler.pkl"
+model_path = "model.pkl"
+
+# Download files from Google Drive
+st.write("Downloading required files...")
+gdown.download(scaler_url, scaler_path, quiet=False)
+gdown.download(model_url, model_path, quiet=False)
+
+# Load the scaler and model
 scaler = joblib.load(scaler_path)
+model = joblib.load(model_path)
 
 # App title and description
 st.title("NALYTICS Stroke Prediction by Maxwell Adigwe")
-st.sidebar.markdown("""
+st.sidebar.markdown(""" 
 This app predicts the likelihood of stroke based on user input data. 
                      
 Please use the options below to provide your details.
@@ -65,39 +76,20 @@ def user_input_features():
 
 # Collect user input
 input_df = user_input_features()
+
 # Display user inputs
-st.subheader("User Input Parameters ")
+st.subheader("User Input Parameters")
 st.write(input_df)
 
 # Scale the input data
 scaled_input = scaler.transform(input_df)
 
 # Make predictions
-prediction = model.predict(scaled_input)
-prediction_proba = model.predict_proba(scaled_input)
 
-# Display the prediction result
-st.subheader("Prediction")
-stroke_outcome = "Stroke Likely" if prediction[0] == 1 else "No Stroke"
-st.write(f"**Result:** {stroke_outcome}")
 
-st.subheader("Probability of Stroke")
-st.write(f"**Likelihood of Stroke:** {prediction_proba[0][1] * 100:.2f}%")
+
 
 # Add footer
 st.sidebar.markdown("---")
-st.sidebar.markdown("**Note:** This app uses a trained decision tree model to predict stroke based on historical data.")
-
-
-
-
-
-
-
-
-
-
-
-
-
+st.sidebar.markdown("**Note:** This app uses a trained logistic regression model to predict stroke likelihood based on historical data.")
 
